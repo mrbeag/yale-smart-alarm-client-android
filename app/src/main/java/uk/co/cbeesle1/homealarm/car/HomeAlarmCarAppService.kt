@@ -1,5 +1,6 @@
 package uk.co.cbeesle1.homealarm.car
 
+import android.content.Context
 import android.content.Intent
 import androidx.car.app.CarAppService
 import androidx.car.app.CarContext
@@ -32,15 +33,23 @@ import uk.co.cbeesle1.homealarm.domain.ConfirmationFreshness
 import uk.co.cbeesle1.homealarm.domain.ModeButtonState
 
 class HomeAlarmCarAppService : CarAppService() {
-    override fun createHostValidator(): HostValidator = if (BuildConfig.DEBUG) {
-        HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
-    } else {
-        HostValidator.Builder(applicationContext)
-            .addAllowedHosts(R.array.hosts_allowlist)
-            .build()
-    }
+    override fun createHostValidator(): HostValidator = createHomeAlarmHostValidator(
+        context = applicationContext,
+        allowUnknownHosts = BuildConfig.DEBUG,
+    )
 
     override fun onCreateSession(): Session = HomeAlarmSession()
+}
+
+internal fun createHomeAlarmHostValidator(
+    context: Context,
+    allowUnknownHosts: Boolean,
+): HostValidator = if (allowUnknownHosts) {
+    HostValidator.ALLOW_ALL_HOSTS_VALIDATOR
+} else {
+    HostValidator.Builder(context)
+        .addAllowedHosts(androidx.car.app.R.array.hosts_allowlist_sample)
+        .build()
 }
 
 private class HomeAlarmSession : Session() {

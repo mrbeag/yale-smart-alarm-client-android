@@ -21,6 +21,20 @@ import uk.co.cbeesle1.homealarm.domain.AlarmMode
 @RunWith(AndroidJUnit4::class)
 class HomeAlarmCarTemplateTest {
     @Test
+    fun productionValidatorIncludesTheSignedAndroidAutoHost() {
+        val validator = createHomeAlarmHostValidator(
+            context = ApplicationProvider.getApplicationContext(),
+            allowUnknownHosts = false,
+        )
+
+        assertTrue(
+            validator.allowedHosts["com.google.android.projection.gearhead"]
+                .orEmpty()
+                .isNotEmpty(),
+        )
+    }
+
+    @Test
     fun gridShowsExactlyThreeModesAndMarksConfirmedMode() {
         val controller = AlarmController(
             initialGateway = object : AlarmGateway {
