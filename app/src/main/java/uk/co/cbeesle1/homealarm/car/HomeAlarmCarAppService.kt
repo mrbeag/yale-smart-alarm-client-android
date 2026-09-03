@@ -58,6 +58,10 @@ internal class HomeAlarmScreen(
 
     init {
         lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) {
+                controller.refreshOnSurfaceStart()
+            }
+
             override fun onDestroy(owner: LifecycleOwner) {
                 scope.cancel()
             }

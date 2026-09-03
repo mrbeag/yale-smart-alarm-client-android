@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Home Alarm</string>
+    <string name="complication_name">Home Alarm state</string>
+</resources>

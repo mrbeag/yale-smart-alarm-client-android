@@ -164,6 +164,33 @@ class AlarmControllerTest {
         assertNull(controller.state.value.message)
     }
 
+    @Test
+    fun openingSurfaceRetriesOneTransientStatusFailure() = runTest {
+        var reads = 0
+        val gateway = object : AlarmGateway {
+            override suspend fun currentMode(): AlarmMode {
+                if (reads++ == 0) error("network not ready")
+                return AlarmMode.HOME
+            }
+
+            override suspend fun requestMode(mode: AlarmMode) = true
+        }
+        val controller = AlarmController(
+            initialGateway = gateway,
+            scope = backgroundScope,
+            verificationDelaysMillis = listOf(0),
+            delayFunction = {},
+            clock = { 123L },
+        )
+
+        controller.refreshOnSurfaceStartNow()
+
+        assertEquals(2, reads)
+        assertEquals(AlarmMode.HOME, controller.state.value.confirmedMode)
+        assertEquals(ConfirmationFreshness.CURRENT, controller.state.value.freshness)
+        assertNull(controller.state.value.message)
+    }
+
     private fun kotlinx.coroutines.test.TestScope.controller(gateway: AlarmGateway) = AlarmController(
         initialGateway = gateway,
         scope = backgroundScope,

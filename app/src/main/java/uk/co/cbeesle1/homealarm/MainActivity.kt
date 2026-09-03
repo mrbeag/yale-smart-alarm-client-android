@@ -86,6 +86,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        (application as HomeAlarmApplication).controller.refreshOnSurfaceStart()
+    }
 }
 
 @Composable

@@ -16,3 +16,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "HomeAlarm"
 include(":app")
+include(":common")
+include(":wear")

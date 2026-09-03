@@ -80,19 +80,32 @@ trap cleanup EXIT
 
 cd "$project_dir"
 ./gradlew \
+    :common:testDebugUnitTest \
     :app:testDebugUnitTest \
+    :wear:testDebugUnitTest \
     :app:lintRelease \
+    :wear:lintRelease \
     :app:bundleRelease \
+    :wear:bundleRelease \
     --no-parallel \
     --max-workers=1
 
-bundle_path=$project_dir/app/build/outputs/bundle/release/app-release.aab
-test -f "$bundle_path"
-jarsigner -verify -strict "$bundle_path" >/dev/null
+phone_bundle_path=$project_dir/app/build/outputs/bundle/release/app-release.aab
+wear_bundle_path=$project_dir/wear/build/outputs/bundle/release/wear-release.aab
+for bundle_path in "$phone_bundle_path" "$wear_bundle_path"; do
+    test -f "$bundle_path"
+    verification_output=$(jarsigner -verify -strict "$bundle_path" 2>&1)
+    if ! grep -Fq "jar verified." <<<"$verification_output"; then
+        echo "Bundle is not signed correctly: $bundle_path" >&2
+        echo "$verification_output" >&2
+        exit 1
+    fi
+done
 
 echo
-echo "Signed Play bundle ready:"
-echo "$bundle_path"
+echo "Signed Play bundles ready:"
+echo "$phone_bundle_path"
+echo "$wear_bundle_path"
 echo
 echo "Back up this upload key securely:"
 echo "$keystore_path"

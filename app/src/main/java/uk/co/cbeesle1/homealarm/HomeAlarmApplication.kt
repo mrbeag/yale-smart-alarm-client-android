@@ -11,7 +11,7 @@ import uk.co.cbeesle1.homealarm.data.YaleSession
 import uk.co.cbeesle1.homealarm.domain.AlarmController
 
 class HomeAlarmApplication : Application() {
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    internal val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private lateinit var sessionStore: SecureSessionStore
     lateinit var controller: AlarmController
         private set
@@ -27,7 +27,6 @@ class HomeAlarmApplication : Application() {
             initialGateway = realGateway,
             scope = applicationScope,
         )
-        controller.refresh()
     }
 
     suspend fun connectYale(email: String, password: String, areaId: Int): Result<Unit> = runCatching {

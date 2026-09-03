@@ -28,20 +28,32 @@ class AlarmController(
         scope.launch { refreshNow() }
     }
 
-    suspend fun refreshNow() = operationMutex.withLock {
+    fun refreshOnSurfaceStart() {
+        scope.launch { refreshOnSurfaceStartNow() }
+    }
+
+    internal suspend fun refreshOnSurfaceStartNow() {
+        val firstReadSucceeded = refreshNow()
+        if (!firstReadSucceeded && !mutableState.value.requiresSetup) {
+            delayFunction(INITIAL_READ_RETRY_DELAY_MILLIS)
+            refreshNow()
+        }
+    }
+
+    suspend fun refreshNow(): Boolean = operationMutex.withLock {
         val activeGateway = gateway ?: run {
             mutableState.value = mutableState.value.copy(
                 requiresSetup = true,
                 isRefreshing = false,
                 freshness = ConfirmationFreshness.UNKNOWN,
             )
-            return@withLock
+            return@withLock false
         }
-        if (mutableState.value.pendingMode != null) return@withLock
+        if (mutableState.value.pendingMode != null) return@withLock false
 
         mutableState.value = mutableState.value.copy(isRefreshing = true, message = null)
-        runCatching { activeGateway.currentMode() }
-            .onSuccess { reported ->
+        runCatching { activeGateway.currentMode() }.fold(
+            onSuccess = { reported ->
                 mutableState.value = mutableState.value.copy(
                     confirmedMode = reported,
                     freshness = ConfirmationFreshness.CURRENT,
@@ -49,10 +61,13 @@ class AlarmController(
                     requiresSetup = false,
                     lastCheckedEpochMillis = clock(),
                 )
-            }
-            .onFailure {
+                true
+            },
+            onFailure = {
                 handleReadFailure(it)
-            }
+                false
+            },
+        )
     }
 
     fun requestMode(mode: AlarmMode) {

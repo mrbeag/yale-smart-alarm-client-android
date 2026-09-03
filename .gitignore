@@ -4,6 +4,7 @@
 /.idea/
 /build/
 /app/build/
+/*/build/
 captures/
 *.jks
 *.keystore
