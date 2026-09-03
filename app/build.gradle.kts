@@ -86,6 +86,7 @@ dependencies {
     implementation("androidx.car.app:app:1.7.0")
     implementation("androidx.car.app:app-projected:1.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
     implementation("com.google.android.gms:play-services-wearable:20.0.1")
     implementation(project(":common"))
 

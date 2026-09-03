@@ -42,6 +42,23 @@ class WearProtocolTest {
     }
 
     @Test
+    fun pushedStateRoundTripsOnStatePath() {
+        val response = WearResponse(
+            requestId = "notification-1",
+            confirmedMode = RemoteAlarmMode.AWAY,
+            freshness = RemoteFreshness.CURRENT,
+            requiresPhoneSetup = false,
+            message = null,
+        )
+
+        assertEquals(
+            response,
+            WearProtocol.decodeState(WearProtocol.STATE_PATH, WearProtocol.encodeResponse(response)),
+        )
+        assertNull(WearProtocol.decodeState(WearProtocol.RESPONSE_PATH, WearProtocol.encodeResponse(response)))
+    }
+
+    @Test
     fun unknownPathIsRejected() {
         assertNull(WearProtocol.decodeRequest("/other", WearProtocol.encodeRequest(WearRequest.Status("id"))))
     }

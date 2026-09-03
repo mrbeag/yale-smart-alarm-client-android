@@ -8,13 +8,16 @@ The phone UI follows Android's system light or dark theme automatically. There i
 
 The Wear OS app is a non-standalone companion. It sends status and mode requests to the paired phone over Google's Wear Data Layer; only the phone talks to Yale. Opening either UI refreshes the alarm state and retries one transient read failure after one second.
 
-The Wear OS complication displays the current mode on compatible watch-face slots and opens the full mode controls when tapped. If the phone cannot be reached, it labels the locally cached mode as the last confirmed state rather than presenting it as current.
+The Wear OS complication displays the latest Yale-confirmed mode on compatible watch-face slots and opens the full mode controls when tapped. It does not poll in the background. Instead, the phone can use notifications from the official Yale Smart Living Alarm app as event triggers, read the real state from Yale, and push that confirmed state to the watch.
+
+Enable **Home Alarm Yale event sync** from the phone app's notification-access prompt. Android grants a notification listener access to all notifications, so Home Alarm enforces a narrower boundary itself: it accepts events only from the exact `com.mobilepeople.yale.yalehome` package, ignores ongoing notifications, and never reads notification titles, bodies, or actions. A notification is only a trigger; a failed Yale status read never updates the watch from notification content or stale state. The official Yale app must remain installed, signed in, and configured to receive the desired alarm notifications.
 
 ## Safety model
 
 - Debug and release builds use the same real Yale login and alarm-control workflow.
 - The last successful Yale email, password, area, and refresh token are encrypted with Android Keystore and excluded from backup and device transfer.
 - Wear OS and Android Auto never accept, store, or display Yale credentials.
+- Notification-triggered watch updates contain only the confirmed alarm mode; notification content is never copied to the watch.
 - Away, Home, and Disarmed each issue their request with one tap.
 - A successful command response is not treated as proof that the alarm changed state.
 

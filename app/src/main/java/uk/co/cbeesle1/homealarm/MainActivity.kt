@@ -1,6 +1,8 @@
 package uk.co.cbeesle1.homealarm
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.text.format.DateFormat
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -69,6 +71,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.app.NotificationManagerCompat
 import kotlinx.coroutines.launch
 import uk.co.cbeesle1.homealarm.domain.AlarmMode
 import uk.co.cbeesle1.homealarm.domain.AlarmUiState
@@ -77,20 +80,37 @@ import uk.co.cbeesle1.homealarm.domain.ModeButtonState
 import java.util.Date
 
 class MainActivity : ComponentActivity() {
+    private var notificationAccessEnabled by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        notificationAccessEnabled = isYaleNotificationSyncEnabled()
         setContent {
             HomeAlarmTheme {
-                HomeAlarmRoot(application as HomeAlarmApplication)
+                HomeAlarmRoot(
+                    application = application as HomeAlarmApplication,
+                    notificationAccessEnabled = notificationAccessEnabled,
+                    onOpenNotificationAccess = {
+                        startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    },
+                )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        notificationAccessEnabled = isYaleNotificationSyncEnabled()
     }
 
     override fun onStart() {
         super.onStart()
         (application as HomeAlarmApplication).controller.refreshOnSurfaceStart()
     }
+
+    private fun isYaleNotificationSyncEnabled(): Boolean =
+        NotificationManagerCompat.getEnabledListenerPackages(this).contains(packageName)
 }
 
 @Composable
@@ -103,7 +123,11 @@ private fun HomeAlarmTheme(content: @Composable () -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HomeAlarmRoot(application: HomeAlarmApplication) {
+private fun HomeAlarmRoot(
+    application: HomeAlarmApplication,
+    notificationAccessEnabled: Boolean,
+    onOpenNotificationAccess: () -> Unit,
+) {
     val state by application.controller.state.collectAsStateWithLifecycle()
     var showSetup by rememberSaveable { mutableStateOf(false) }
 
@@ -145,8 +169,10 @@ private fun HomeAlarmRoot(application: HomeAlarmApplication) {
     ) { innerPadding ->
         ControlScreen(
             state = state,
+            notificationAccessEnabled = notificationAccessEnabled,
             modifier = Modifier.padding(innerPadding),
             onSelect = application.controller::requestMode,
+            onOpenNotificationAccess = onOpenNotificationAccess,
         )
     }
 
@@ -161,8 +187,10 @@ private fun HomeAlarmRoot(application: HomeAlarmApplication) {
 @Composable
 private fun ControlScreen(
     state: AlarmUiState,
+    notificationAccessEnabled: Boolean,
     modifier: Modifier = Modifier,
     onSelect: (AlarmMode) -> Unit,
+    onOpenNotificationAccess: () -> Unit,
 ) {
     val context = LocalContext.current
     val checkedAt = state.lastCheckedEpochMillis?.let {
@@ -196,6 +224,10 @@ private fun ControlScreen(
             )
         }
 
+        if (!notificationAccessEnabled) {
+            NotificationSyncCard(onOpenNotificationAccess)
+        }
+
         HorizontalDivider(
             modifier = Modifier.padding(top = 6.dp),
             color = MaterialTheme.colorScheme.outlineVariant,
@@ -225,6 +257,38 @@ private fun ControlScreen(
                 }
             }
             if (state.isRefreshing) CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 3.dp)
+        }
+    }
+}
+
+@Composable
+private fun NotificationSyncCard(onOpenNotificationAccess: () -> Unit) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Text(
+                "Instant watch updates are off",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                "Allow notification access to use official Yale alarm events as refresh triggers. " +
+                    "Home Alarm ignores every other app and never reads Yale notification text; " +
+                    "it checks Yale directly before updating your watch.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Button(onClick = onOpenNotificationAccess) {
+                Text("Enable notification access")
+            }
         }
     }
 }

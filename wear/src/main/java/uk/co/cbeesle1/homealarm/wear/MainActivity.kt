@@ -21,11 +21,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
 import uk.co.cbeesle1.homealarm.common.RemoteAlarmMode
 import uk.co.cbeesle1.homealarm.common.RemoteFreshness
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var transport: DataLayerPhoneTransport
@@ -44,6 +48,11 @@ class MainActivity : ComponentActivity() {
                 HomeAlarmComplicationService.requestUpdate(applicationContext)
             },
         )
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                WearStateUpdates.confirmedModes.collect(controller::applyPushedConfirmedMode)
+            }
+        }
         setContent {
             HomeAlarmWearTheme {
                 HomeAlarmWearScreen(controller)

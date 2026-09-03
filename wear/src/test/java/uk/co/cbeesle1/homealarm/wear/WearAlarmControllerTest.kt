@@ -15,6 +15,26 @@ import uk.co.cbeesle1.homealarm.common.WearResponse
 
 class WearAlarmControllerTest {
     @Test
+    fun pushedConfirmedModeUpdatesAnOpenWatchWithoutPolling() = runTest {
+        val persisted = mutableListOf<RemoteAlarmMode>()
+        val controller = WearAlarmController(
+            transport = object : PhoneAlarmTransport {
+                override suspend fun request(request: WearRequest): WearResponse =
+                    error("A pushed update must not make a phone request")
+            },
+            scope = backgroundScope,
+            initialConfirmedMode = RemoteAlarmMode.HOME,
+            onConfirmedMode = persisted::add,
+        )
+
+        controller.applyPushedConfirmedMode(RemoteAlarmMode.AWAY)
+
+        assertEquals(RemoteAlarmMode.AWAY, controller.state.value.confirmedMode)
+        assertEquals(RemoteFreshness.CURRENT, controller.state.value.freshness)
+        assertEquals(listOf(RemoteAlarmMode.AWAY), persisted)
+    }
+
+    @Test
     fun openingSurfaceRetriesOneTransientFailure() = runTest {
         var calls = 0
         var delays = 0

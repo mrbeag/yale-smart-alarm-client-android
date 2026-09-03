@@ -92,6 +92,18 @@ class WearAlarmController(
         scope.launch { requestModeNow(mode) }
     }
 
+    internal fun applyPushedConfirmedMode(mode: RemoteAlarmMode) {
+        onConfirmedMode(mode)
+        val before = mutableState.value
+        mutableState.value = before.copy(
+            confirmedMode = mode,
+            freshness = RemoteFreshness.CURRENT,
+            pendingMode = before.pendingMode?.takeUnless { it == mode },
+            requiresPhoneSetup = false,
+            message = null,
+        )
+    }
+
     internal suspend fun requestModeNow(mode: RemoteAlarmMode) = operationMutex.withLock {
         val before = mutableState.value
         if (!before.commandsEnabled || before.confirmedMode == mode) return@withLock

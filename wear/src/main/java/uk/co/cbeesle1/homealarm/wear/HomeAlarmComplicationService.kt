@@ -18,28 +18,15 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import uk.co.cbeesle1.homealarm.common.RemoteAlarmMode
 import uk.co.cbeesle1.homealarm.common.RemoteFreshness
-import uk.co.cbeesle1.homealarm.common.WearRequest
-import java.util.UUID
 
 class HomeAlarmComplicationService : SuspendingComplicationDataSourceService() {
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
-        val store = WearAlarmStateStore(applicationContext)
-        val transport = DataLayerPhoneTransport(
-            context = applicationContext,
-            responseTimeoutMillis = COMPLICATION_RESPONSE_TIMEOUT_MILLIS,
-        )
-        val response = try {
-            runCatching {
-                transport.request(WearRequest.Status(UUID.randomUUID().toString()))
-            }.getOrNull()
-        } finally {
-            transport.close()
-        }
-        response?.confirmedMode?.let(store::writeConfirmedMode)
+        val cachedState = WearAlarmStateStore(applicationContext).readState()
         val snapshot = resolveComplicationSnapshot(
-            responseMode = response?.confirmedMode,
-            responseFreshness = response?.freshness,
-            cachedMode = store.readConfirmedMode(),
+            responseMode = null,
+            responseFreshness = null,
+            cachedMode = cachedState?.mode,
+            cachedFreshness = cachedState?.freshness,
         )
         return complicationData(request.complicationType, snapshot)
     }
@@ -111,8 +98,6 @@ class HomeAlarmComplicationService : SuspendingComplicationDataSourceService() {
     private fun text(value: String): ComplicationText = PlainComplicationText.Builder(value).build()
 
     companion object {
-        private const val COMPLICATION_RESPONSE_TIMEOUT_MILLIS = 8_000L
-
         internal fun requestUpdate(context: Context) {
             ComplicationDataSourceUpdateRequester.create(
                 context,
@@ -131,13 +116,17 @@ internal fun resolveComplicationSnapshot(
     responseMode: RemoteAlarmMode?,
     responseFreshness: RemoteFreshness?,
     cachedMode: RemoteAlarmMode?,
+    cachedFreshness: RemoteFreshness? = null,
 ): ComplicationSnapshot = when {
     responseMode != null -> ComplicationSnapshot(
         mode = responseMode,
         isCurrent = responseFreshness == RemoteFreshness.CURRENT,
     )
 
-    cachedMode != null -> ComplicationSnapshot(cachedMode, isCurrent = false)
+    cachedMode != null -> ComplicationSnapshot(
+        cachedMode,
+        isCurrent = cachedFreshness == RemoteFreshness.CURRENT,
+    )
     else -> ComplicationSnapshot(mode = null, isCurrent = false)
 }
 

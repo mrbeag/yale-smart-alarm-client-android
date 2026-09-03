@@ -39,6 +39,9 @@ object WearProtocol {
     const val STATUS_REQUEST_PATH = "/home-alarm/v1/request/status"
     const val MODE_REQUEST_PATH = "/home-alarm/v1/request/mode"
     const val RESPONSE_PATH = "/home-alarm/v1/response"
+    const val STATE_PATH = "/home-alarm/v1/state"
+    const val STATE_PAYLOAD_KEY = "response"
+    const val STATE_UPDATED_AT_KEY = "updatedAt"
 
     fun encodeRequest(request: WearRequest): ByteArray = when (request) {
         is WearRequest.Status -> fields(
@@ -74,6 +77,15 @@ object WearProtocol {
 
     fun decodeResponse(path: String, payload: ByteArray): WearResponse? {
         if (path != RESPONSE_PATH) return null
+        return decodeResponsePayload(payload)
+    }
+
+    fun decodeState(path: String, payload: ByteArray): WearResponse? {
+        if (path != STATE_PATH) return null
+        return decodeResponsePayload(payload)
+    }
+
+    private fun decodeResponsePayload(payload: ByteArray): WearResponse? {
         val values = parse(payload)
         val requestId = values["requestId"]?.takeIf(String::isNotBlank) ?: return null
         val mode = values["confirmedMode"]

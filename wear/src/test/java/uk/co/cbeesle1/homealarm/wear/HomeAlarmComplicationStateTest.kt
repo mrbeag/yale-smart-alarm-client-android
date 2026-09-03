@@ -31,4 +31,17 @@ class HomeAlarmComplicationStateTest {
         assertEquals(RemoteAlarmMode.DISARMED, snapshot.mode)
         assertFalse(snapshot.isCurrent)
     }
+
+    @Test
+    fun eventDrivenCachedStateRemainsCurrentWithoutAComplicationPoll() {
+        val snapshot = resolveComplicationSnapshot(
+            responseMode = null,
+            responseFreshness = null,
+            cachedMode = RemoteAlarmMode.HOME,
+            cachedFreshness = RemoteFreshness.CURRENT,
+        )
+
+        assertEquals(RemoteAlarmMode.HOME, snapshot.mode)
+        assertTrue(snapshot.isCurrent)
+    }
 }
