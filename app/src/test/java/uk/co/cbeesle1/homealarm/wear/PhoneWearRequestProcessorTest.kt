@@ -1,8 +1,10 @@
 package uk.co.cbeesle1.homealarm.wear
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import uk.co.cbeesle1.homealarm.common.RemoteAlarmMode
 import uk.co.cbeesle1.homealarm.common.RemoteFreshness
@@ -13,6 +15,28 @@ import uk.co.cbeesle1.homealarm.domain.AlarmGateway
 import uk.co.cbeesle1.homealarm.domain.AlarmMode
 
 class PhoneWearRequestProcessorTest {
+    @Test
+    fun listenerCallbackBlocksUntilResponseHasBeenSent() {
+        val events = mutableListOf<String>()
+        val runner = BlockingPhoneWearRequestRunner(
+            process = { _, _ ->
+                delay(10)
+                events += "processed"
+                byteArrayOf(4, 2)
+            },
+            sendResponse = { nodeId, response ->
+                delay(10)
+                assertEquals("phone-node", nodeId)
+                assertTrue(response.contentEquals(byteArrayOf(4, 2)))
+                events += "sent"
+            },
+        )
+
+        runner.handle("/request", byteArrayOf(1), "phone-node")
+
+        assertEquals(listOf("processed", "sent"), events)
+    }
+
     @Test
     fun statusRequestReturnsFreshPhoneState() = runTest {
         val controller = AlarmController(
