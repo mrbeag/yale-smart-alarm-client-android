@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate deterministic Google Play artwork for Home Alarm."""
+"""Generate Yale Smart Alarm Client artwork; retain the navy/green shield layout."""
 
 from pathlib import Path
 
@@ -117,11 +117,15 @@ def make_feature_graphic() -> None:
     )
     shield_mark(draw, (120, 94, 320, 406))
 
-    draw.text((430 * SCALE, 105 * SCALE), "Home Alarm", font=font(62, bold=True), fill=WHITE)
+    title = "Yale Smart Alarm Client"
+    title_size = 62
+    while draw.textlength(title, font=font(title_size, bold=True)) > 550 * SCALE:
+        title_size -= 1
+    draw.text((430 * SCALE, 105 * SCALE), title, font=font(title_size, bold=True), fill=WHITE)
     draw.text(
         (434 * SCALE, 190 * SCALE),
-        "Secure control from phone, car and watch",
-        font=font(24),
+        "Unofficial • Android, Wear OS & Android Auto",
+        font=font(22),
         fill=PALE_BLUE,
     )
 
