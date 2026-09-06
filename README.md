@@ -1,6 +1,10 @@
-# Home Alarm for Android, Wear OS, and Android Auto
+# Yale Smart Alarm Client for Android
 
-A private, family-oriented Android, Wear OS, and Android Auto controller for Yale Smart Alarm systems.
+An unofficial Android, Wear OS, and Android Auto controller for Yale Smart Alarm systems.
+
+The Yale API integration is adapted into Kotlin from [domwillcode/yale-smart-alarm-client](https://github.com/domwillcode/yale-smart-alarm-client). This project adds Android phone, Wear OS and Android Auto interfaces. See [NOTICE.md](NOTICE.md) and the [upstream Apache-2.0 licence](licenses/yale-smart-alarm-client-APACHE-2.0.txt).
+
+Not affiliated with or endorsed by Yale or ASSA ABLOY.
 
 The UI has exactly three mode controls: **Away**, **Home**, and **Disarmed**. A requested mode remains in a visible **Switching** state until a fresh status read confirms it. The previous confirmed mode stays highlighted during that transition.
 
@@ -10,7 +14,7 @@ The Wear OS app is a non-standalone companion. It sends status and mode requests
 
 The Wear OS complication displays the latest Yale-confirmed mode on compatible watch-face slots and opens the full mode controls when tapped. It does not poll in the background. Instead, the phone can use notifications from the official Yale Smart Living Alarm app as event triggers, read the real state from Yale, and push that confirmed state to the watch.
 
-Enable **Home Alarm Yale event sync** from the phone app's notification-access prompt. Android grants a notification listener access to all notifications, so Home Alarm enforces a narrower boundary itself: it accepts events only from the exact `com.mobilepeople.yale.yalehome` package, ignores ongoing notifications, and never reads notification titles, bodies, or actions. A notification is only a trigger; a failed Yale status read never updates the watch from notification content or stale state. The official Yale app must remain installed, signed in, and configured to receive the desired alarm notifications.
+Enable **Yale Smart Alarm Client Yale event sync** from the phone app's notification-access prompt. Android grants a notification listener access to all notifications, so Yale Smart Alarm Client enforces a narrower boundary itself: it accepts events only from the exact `com.mobilepeople.yale.yalehome` package, ignores ongoing notifications, and never reads notification titles, bodies, or actions. A notification is only a trigger; a failed Yale status read never updates the watch from notification content or stale state. The official Yale app must remain installed, signed in, and configured to receive the desired alarm notifications.
 
 ## Safety model
 

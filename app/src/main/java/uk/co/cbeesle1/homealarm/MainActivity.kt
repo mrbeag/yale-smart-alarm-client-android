@@ -142,7 +142,7 @@ private fun HomeAlarmRoot(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Home Alarm", fontWeight = FontWeight.Bold)
+                        Text("Yale Smart Alarm Client", fontWeight = FontWeight.Bold)
                         Text(
                             "Yale Smart Alarm",
                             style = MaterialTheme.typography.labelMedium,
@@ -281,7 +281,7 @@ private fun NotificationSyncCard(onOpenNotificationAccess: () -> Unit) {
             )
             Text(
                 "Allow notification access to use official Yale alarm events as refresh triggers. " +
-                    "Home Alarm ignores every other app and never reads Yale notification text; " +
+                    "Yale Smart Alarm Client ignores every other app and never reads Yale notification text; " +
                     "it checks Yale directly before updating your watch.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -418,7 +418,7 @@ private fun SetupScreen(application: HomeAlarmApplication) {
                 modifier = Modifier.size(56.dp),
             )
             Spacer(Modifier.height(16.dp))
-            Text("Set up Home Alarm", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Text("Set up Yale Smart Alarm Client", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
             Text(
                 "Sign in on this phone before using Android Auto.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

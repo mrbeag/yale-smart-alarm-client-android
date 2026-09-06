@@ -42,9 +42,9 @@ class HomeAlarmComplicationService : SuspendingComplicationDataSourceService() {
     ): ComplicationData? {
         val modeText = snapshot.mode?.complicationLabel ?: "Alarm"
         val spokenText = when {
-            snapshot.mode == null -> "Home Alarm. Open the app to check its state."
-            snapshot.isCurrent -> "Home Alarm is ${snapshot.mode.spokenLabel}."
-            else -> "Home Alarm was last confirmed as ${snapshot.mode.spokenLabel}."
+            snapshot.mode == null -> "Yale Smart Alarm Client. Open the app to check its state."
+            snapshot.isCurrent -> "Yale Smart Alarm Client is ${snapshot.mode.spokenLabel}."
+            else -> "Yale Smart Alarm Client was last confirmed as ${snapshot.mode.spokenLabel}."
         }
         val contentDescription = text(spokenText)
         val image = MonochromaticImage.Builder(
@@ -64,9 +64,9 @@ class HomeAlarmComplicationService : SuspendingComplicationDataSourceService() {
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = text(
                     if (snapshot.isCurrent) {
-                        "Home Alarm: $modeText"
+                        "Yale Smart Alarm Client: $modeText"
                     } else {
-                        "Home Alarm: $modeText (last)"
+                        "Yale Smart Alarm Client: $modeText (last)"
                     },
                 ),
                 contentDescription = contentDescription,

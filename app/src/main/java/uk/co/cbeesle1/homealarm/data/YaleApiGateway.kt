@@ -1,3 +1,7 @@
+// Yale API integration adapted into Kotlin from domwillcode/yale-smart-alarm-client.
+// Upstream: https://github.com/domwillcode/yale-smart-alarm-client (Apache-2.0).
+// Modified for Android HTTP requests and persisted session updates; see NOTICE.md
+// and licenses/yale-smart-alarm-client-APACHE-2.0.txt for attribution and licence.
 package uk.co.cbeesle1.homealarm.data
 
 import kotlinx.coroutines.Dispatchers

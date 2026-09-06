@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Home Alarm</string>
-    <string name="yale_notification_listener_name">Home Alarm Yale event sync</string>
+    <string name="app_name">Yale Smart Alarm Client</string>
+    <string name="yale_notification_listener_name">Yale Smart Alarm Client Yale event sync</string>
 </resources>

@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Home Alarm</string>
-    <string name="complication_name">Home Alarm state</string>
+    <string name="app_name">Yale Smart Alarm Client</string>
+    <string name="complication_name">Yale Smart Alarm Client state</string>
 </resources>

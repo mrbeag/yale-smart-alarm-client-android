@@ -83,7 +83,7 @@ internal class HomeAlarmScreen(
     override fun onGetTemplate(): Template {
         val state = controller.state.value
         if (state.requiresSetup) {
-            return MessageTemplate.Builder("Open Home Alarm on your phone and finish secure Yale setup.")
+            return MessageTemplate.Builder("Open Yale Smart Alarm Client on your phone and finish secure Yale setup.")
                 .setTitle("Finish setup on phone")
                 .setHeaderAction(Action.APP_ICON)
                 .build()
@@ -92,7 +92,7 @@ internal class HomeAlarmScreen(
             return MessageTemplate.Builder(
                 if (state.isRefreshing) "Checking the current alarm mode…" else "Current alarm state is unavailable.",
             )
-                .setTitle("Home Alarm")
+                .setTitle("Yale Smart Alarm Client")
                 .setHeaderAction(Action.APP_ICON)
                 .addAction(
                     Action.Builder()
@@ -106,7 +106,7 @@ internal class HomeAlarmScreen(
         val items = ItemList.Builder()
         AlarmMode.entries.forEach { mode -> items.addItem(modeGridItem(mode, state)) }
         return GridTemplate.Builder()
-            .setTitle("Home Alarm")
+            .setTitle("Yale Smart Alarm Client")
             .setHeaderAction(Action.APP_ICON)
             .setSingleList(items.build())
             .build()

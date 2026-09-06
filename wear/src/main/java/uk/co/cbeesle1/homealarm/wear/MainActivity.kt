@@ -89,7 +89,7 @@ private fun HomeAlarmWearScreen(controller: WearAlarmController) {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
-            text = "Home Alarm",
+            text = "Yale Smart Alarm Client",
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
@@ -133,7 +133,7 @@ private fun HomeAlarmWearScreen(controller: WearAlarmController) {
         state.message?.let { message ->
             Text(
                 text = if (state.requiresPhoneSetup) {
-                    "Open Home Alarm on your phone to sign in."
+                    "Open Yale Smart Alarm Client on your phone to sign in."
                 } else {
                     message
                 },
