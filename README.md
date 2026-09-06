@@ -47,4 +47,8 @@ For a connector-enabled local build, set `YALE_BASIC_AUTH` only in the shell run
 
 The API 36 Google APIs emulator can verify the phone app and Car App templates. A full Desktop Head Unit projection requires the current Android Auto app with developer mode and **Start head unit server** enabled, so use a Play-enabled emulator or the target Samsung phone for that final check. End-to-end watch testing requires a paired phone/watch environment with Google Play services on both devices.
 
+## Licence and attribution
+
+Licensed under the [Apache License, Version 2.0](LICENSE). See [NOTICE.md](NOTICE.md) for credit to domwillcode and the upstream contributors whose Python Yale API implementation was adapted into Kotlin. Third-party dependencies retain their own licences.
+
 This project is unofficial and is not affiliated with or endorsed by Yale or ASSA ABLOY.
